@@ -1,0 +1,6 @@
+/target/
+/dist/
+/shots/
+/.crosscheck/
+.DS_Store
+*.familyfile.saving

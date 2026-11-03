@@ -1,0 +1,37 @@
+[package]
+name = "family-file"
+version = "0.1.0"
+edition = "2024"
+description = "A family history program for current macOS, Windows and Linux"
+license = "MIT"
+readme = "README.md"
+authors = ["Doyle McIntosh"]
+
+[dependencies]
+eframe = { version = "0.37.0", features = ["persistence"] }
+egui_extras = "0.37.0"
+encoding_rs = "0.8.44"
+image = { version = "0.25.10", default-features = false, features = ["png", "jpeg", "gif", "bmp", "tiff"] }
+open = "5.4.5"
+rfd = "0.17.2"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+unicode-normalization = "0.1.26"
+
+# Puts the icon inside family-file.exe on Windows (see build.rs).
+[target.'cfg(windows)'.build-dependencies]
+winresource = "0.1"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+
+# Read by `cargo bundle --release`. Without an identifier the bundle gets an empty
+# CFBundleIdentifier, and macOS crashes the app as soon as it opens a file dialog.
+[package.metadata.bundle]
+name = "Family File"
+identifier = "com.doylemcintosh.familyfile"
+category = "public.app-category.productivity"
+short_description = "A family history program"
+copyright = "Copyright (c) 2026 Doyle McIntosh"
+icon = ["assets/icon.icns"]
