@@ -4,6 +4,14 @@ A family history program for current macOS, Windows and Linux: people, marriages
 sources, notes and photos, with family and pedigree views, search, duplicate merging,
 printable reports, and GEDCOM import and export.
 
+Family File is an attempt to recreate **Personal Ancestral File (PAF)**, the free genealogy program
+from FamilySearch that was discontinued in 2013 and no longer runs well on current computers. It
+aims to keep PAF's simple way of working (one family at a time, pedigree view, plain records)
+on today's systems.
+
+It is an independent project, written from scratch. It contains no PAF code and is not affiliated
+with, endorsed by, or supported by FamilySearch or The Church of Jesus Christ of Latter-day Saints.
+
 ![Family File](docs/screenshot.png)
 
 ## Download
