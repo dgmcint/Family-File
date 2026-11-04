@@ -1,35 +1,36 @@
-# Family File
+# Family Keeper
+
+*Formerly called Family File.*
 
 A family history program for current macOS, Windows and Linux: people, marriages, events,
 sources, notes and photos, with family and pedigree views, search, duplicate merging,
 printable reports, and GEDCOM import and export.
 
-Family File is an attempt to recreate **Personal Ancestral File (PAF)**, the free genealogy program
-from FamilySearch that was discontinued in 2013 and no longer runs well on current computers. It
-aims to keep PAF's simple way of working (one family at a time, pedigree view, plain records)
-on today's systems.
+Family Keeper is a simple, offline family history program in the spirit of the classic desktop
+genealogy programs of the 1990s and 2000s. Many of those programs have been discontinued and no
+longer run well on current computers. Family Keeper aims to keep their simple way of working (one
+family at a time, a pedigree view, plain records) on today's systems.
 
-It is an independent project, written from scratch. It contains no PAF code and is not affiliated
-with, endorsed by, or supported by FamilySearch or The Church of Jesus Christ of Latter-day Saints.
+It is an independent project, written from scratch.
 
-![Family File](docs/screenshot.png)
+![Family Keeper](docs/screenshot.png)
 
 ## Download
 
 Get the latest version from the **Releases** page of this repository:
 
-- **macOS** (Apple Silicon and Intel): `Family-File-macOS.zip`. Unzip it and drag *Family File* to
+- **macOS** (Apple Silicon and Intel): `Family-Keeper-macOS.zip`. Unzip it and drag *Family Keeper* to
   Applications. The app isn't notarized by Apple, so the first time, Control-click it, choose
   **Open**, then **Open** again.
-- **Windows**: `Family-File-Windows.zip`. Unzip and run `family-file.exe`.
-- **Linux** (x86_64): `Family-File-Linux-x86_64.tar.gz`. Unpack and run `family-file`.
+- **Windows**: `Family-Keeper-Windows.zip`. Unzip and run `family-keeper.exe`.
+- **Linux** (x86_64): `Family-Keeper-Linux-x86_64.tar.gz`. Unpack and run `family-keeper`.
 
 ## Building
 
 Install Rust from https://rustup.rs, then in this folder:
 
-- `cargo run --release` builds and starts the program. The program itself is `target/release/family-file`.
-- On a Mac, `scripts/make-macos-app.sh` builds `dist/Family File.app`, which runs on both Apple
+- `cargo run --release` builds and starts the program. The program itself is `target/release/family-keeper`.
+- On a Mac, `scripts/make-macos-app.sh` builds `dist/Family Keeper.app`, which runs on both Apple
   Silicon and Intel Macs. `scripts/make-macos-app.sh --zip` also makes the zip used for releases.
   `cargo bundle --release` (from `cargo install cargo-bundle`) works too and makes an app for your
   own Mac only.
@@ -52,10 +53,12 @@ GitHub builds all three systems and attaches the downloads to a new release.
 
 ## Your data
 
-- Family files end in `.familyfile`. Each save keeps the previous version beside it as `.backup`.
+- Family files end in `.fkf` (Family Keeper file). Files saved as `.familyfile`, from before the
+  program was renamed, still open. Each save keeps the previous version beside it as `.backup`.
 - GEDCOM import reads ANSEL, UTF-8, UTF-16 and Windows Latin. Details the program has no field
   for are kept and written back out on export.
-- Old `.paf` files can't be opened directly. Export them as GEDCOM from the old program first.
+- Files from other genealogy programs can't be opened directly. Export them as GEDCOM from that
+  program first, then import the GEDCOM here.
 
 ## Options
 
@@ -65,4 +68,7 @@ GitHub builds all three systems and attaches the downloads to a new release.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+Family Keeper is free for any **noncommercial** use under the
+[PolyForm Noncommercial License 1.0.0](LICENSE). Individuals, families, churches, libraries,
+schools, genealogy societies and other nonprofits are welcome to use, copy, share and change it.
+**Selling it, or using it to make money, is not allowed.**

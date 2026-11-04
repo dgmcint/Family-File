@@ -743,12 +743,12 @@ fn write_event(out: &mut String, e: &Event) {
 pub fn export(db: &Database) -> String {
     let mut out = String::new();
     let submitter = db.other_records.iter().find(|r| r.tag == "SUBM").and_then(|r| r.xref.clone());
-    out.push_str("0 HEAD\r\n1 SOUR FAMILY-FILE\r\n2 NAME Family File\r\n2 VERS ");
+    out.push_str("0 HEAD\r\n1 SOUR FAMILY-FILE\r\n2 NAME Family Keeper\r\n2 VERS ");
     out.push_str(env!("CARGO_PKG_VERSION"));
     out.push_str("\r\n1 GEDC\r\n2 VERS 5.5.1\r\n2 FORM LINEAGE-LINKED\r\n1 CHAR UTF-8\r\n");
     out.push_str(&format!("1 SUBM @{}@\r\n", submitter.as_deref().unwrap_or("SUBM1")));
     if submitter.is_none() {
-        out.push_str("0 @SUBM1@ SUBM\r\n1 NAME Family File user\r\n");
+        out.push_str("0 @SUBM1@ SUBM\r\n1 NAME Family Keeper user\r\n");
     }
 
     for p in db.people.values() {

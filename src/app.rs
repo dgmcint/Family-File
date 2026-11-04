@@ -423,7 +423,7 @@ impl FamilyApp {
             Pending::Open => {
                 let picked = rfd::FileDialog::new()
                     .set_title("Open a family file")
-                    .add_filter("Family files and GEDCOM", &[storage::FILE_EXTENSION, "ged", "GED", "gedcom", "paf", "PAF"])
+                    .add_filter("Family files and GEDCOM", &[storage::FILE_EXTENSION, storage::OLD_EXTENSION, "ged", "GED", "gedcom"])
                     .pick_file();
                 if let Some(path) = picked {
                     self.load(&path);
@@ -620,7 +620,7 @@ impl FamilyApp {
         let Some(report) = &self.report.built else { return };
         self.print_counter += 1;
         let path = std::env::temp_dir().join(format!(
-            "family-file-report-{}-{}.html",
+            "family-keeper-report-{}-{}.html",
             std::process::id(),
             self.print_counter
         ));
@@ -724,7 +724,7 @@ impl FamilyApp {
     }
 
     fn update_title(&mut self, ctx: &egui::Context) {
-        let title = format!("{}{} – Family File", if self.dirty { "• " } else { "" }, self.file_label());
+        let title = format!("{}{} – Family Keeper", if self.dirty { "• " } else { "" }, self.file_label());
         if title != self.title {
             ctx.send_viewport_cmd(ViewportCommand::Title(title.clone()));
             self.title = title;

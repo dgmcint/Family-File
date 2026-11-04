@@ -128,9 +128,9 @@ fn menu_bar(app: &mut FamilyApp, ui: &mut egui::Ui) {
             }
         });
         ui.menu_button("Help", |ui| {
-            if ui.button("About Family File").clicked() {
+            if ui.button("About Family Keeper").clicked() {
                 app.message = Some((
-                    "About Family File".into(),
+                    "About Family Keeper".into(),
                     format!(
                         "Version {}\n\nKeep your family history: people, marriages, events, sources, notes and photos. Share it with other family history programs using GEDCOM files.",
                         env!("CARGO_PKG_VERSION")

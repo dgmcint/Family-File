@@ -3,4 +3,5 @@
 /shots/
 /.crosscheck/
 .DS_Store
+*.fkf.saving
 *.familyfile.saving

@@ -4,7 +4,10 @@ use crate::model::Database;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
-pub const FILE_EXTENSION: &str = "familyfile";
+pub const FILE_EXTENSION: &str = "fkf";
+/// The ending used before the program was renamed. Those files still open.
+pub const OLD_EXTENSION: &str = "familyfile";
+// Kept from the program's first name, Family Keeper, so files saved before the rename still open.
 const FORMAT: &str = "family-file";
 const VERSION: u32 = 1;
 
@@ -60,9 +63,10 @@ pub fn save(path: &Path, db: &Database) -> Result<(), String> {
 pub fn open(path: &Path) -> Result<Loaded, String> {
     let name = path.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
     let ext = path.extension().map(|e| e.to_string_lossy().to_ascii_lowercase()).unwrap_or_default();
-    if ext == "paf" {
+    // Database files from other genealogy programs, which only that program can read.
+    if matches!(ext.as_str(), "paf" | "ftw" | "ftm" | "ftmb" | "rmgc" | "rmtree" | "fbk" | "gw") {
         return Err(format!(
-            "{name} is an old .paf file, which this program can't read directly. In the old program, choose to export it as a GEDCOM file, then import that here."
+            "{name} is from another genealogy program, which this program can't read directly. In that program, choose to export it as a GEDCOM file, then import that here."
         ));
     }
     let bytes = std::fs::read(path).map_err(|e| format!("Couldn't open {name}: {e}"))?;
@@ -88,7 +92,7 @@ mod tests {
     use super::*;
 
     fn temp_dir(name: &str) -> PathBuf {
-        let dir = std::env::temp_dir().join(format!("family-file-test-{name}-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("family-keeper-test-{name}-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         dir
     }
@@ -96,39 +100,39 @@ mod tests {
     #[test]
     fn saved_file_opens_identically_and_keeps_a_backup() {
         let dir = temp_dir("save");
-        let path = dir.join("mine.familyfile");
+        let path = dir.join("mine.fkf");
         let db = Database::sample();
         save(&path, &Database::default()).unwrap();
         save(&path, &db).unwrap();
         assert_eq!(open(&path).unwrap().db, db);
-        assert!(dir.join("mine.familyfile.backup").exists());
-        assert!(!dir.join("mine.familyfile.saving").exists());
-        let backup = serde_json::from_slice::<Saved>(&std::fs::read(dir.join("mine.familyfile.backup")).unwrap()).unwrap();
+        assert!(dir.join("mine.fkf.backup").exists());
+        assert!(!dir.join("mine.fkf.saving").exists());
+        let backup = serde_json::from_slice::<Saved>(&std::fs::read(dir.join("mine.fkf.backup")).unwrap()).unwrap();
         assert!(backup.db.people.is_empty());
     }
 
     #[test]
     fn explains_files_it_cant_read() {
         let dir = temp_dir("bad");
-        let paf = dir.join("old.paf");
-        std::fs::write(&paf, b"anything").unwrap();
-        assert!(open(&paf).err().unwrap().contains("GEDCOM"));
-        let junk = dir.join("junk.familyfile");
+        let other_program = dir.join("old.paf");
+        std::fs::write(&other_program, b"anything").unwrap();
+        assert!(open(&other_program).err().unwrap().contains("GEDCOM"));
+        let junk = dir.join("junk.fkf");
         std::fs::write(&junk, b"not json").unwrap();
         assert!(open(&junk).is_err());
-        let other = dir.join("other.familyfile");
+        let other = dir.join("other.fkf");
         std::fs::write(&other, br#"{"format":"else","version":1,"db":{}}"#).unwrap();
         assert!(open(&other).is_err());
-        let newer = dir.join("newer.familyfile");
+        let newer = dir.join("newer.fkf");
         std::fs::write(&newer, br#"{"format":"family-file","version":99,"db":{}}"#).unwrap();
         assert!(open(&newer).err().unwrap().contains("newer"));
-        assert!(open(&dir.join("missing.familyfile")).is_err());
+        assert!(open(&dir.join("missing.fkf")).is_err());
     }
 
     #[test]
     fn failed_save_leaves_nothing_behind() {
         let dir = temp_dir("fail");
-        let path = dir.join("no-such-folder").join("mine.familyfile");
+        let path = dir.join("no-such-folder").join("mine.fkf");
         assert!(save(&path, &Database::sample()).is_err());
     }
 }
