@@ -164,6 +164,9 @@ impl FamilyApp {
                 cc.storage.and_then(|s| s.get_string(key))
             }
         };
+        if let Some(name) = saved("colors") {
+            theme::set_name(&name);
+        }
         let zoom = saved("zoom").and_then(|z| z.parse().ok()).filter(|z| (0.75..=2.0).contains(z)).unwrap_or(1.0);
         let last_file = saved("last_file").map(PathBuf::from);
         Self::start(&cc.egui_ctx, zoom, last_file, screenshot, open)
@@ -825,6 +828,7 @@ impl eframe::App for FamilyApp {
             return;
         }
         storage.set_string("zoom", self.zoom.to_string());
+        storage.set_string("colors", theme::name().to_string());
         match &self.path {
             Some(p) => storage.set_string("last_file", p.to_string_lossy().into_owned()),
             None => storage.set_string("last_file", String::new()),

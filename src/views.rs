@@ -4,35 +4,35 @@ use crate::app::{Action, FamilyApp, Pending, Relation, SortBy, Tab};
 use crate::model::*;
 use crate::reports;
 use crate::theme;
-use eframe::egui::{self, Color32, CornerRadius, Margin, RichText, Sense, Stroke, StrokeKind, Vec2, vec2};
+use eframe::egui::{self, CornerRadius, Margin, RichText, Sense, Stroke, StrokeKind, Vec2, vec2};
 use egui_extras::{Column, TableBuilder};
 use std::collections::HashMap;
 
 pub fn show(app: &mut FamilyApp, ui: &mut egui::Ui) {
     let busy = app.busy();
     egui::Panel::top("menu")
-        .frame(egui::Frame::new().fill(theme::CARD).inner_margin(Margin::symmetric(8, 3)))
+        .frame(egui::Frame::new().fill(theme::pal().card).inner_margin(Margin::symmetric(8, 3)))
         .show(ui, |ui| {
             ui.add_enabled_ui(!busy, |ui| menu_bar(app, ui));
         });
     egui::Panel::top("tabs")
-        .frame(egui::Frame::new().fill(theme::PAPER).inner_margin(Margin::symmetric(12, 8)))
+        .frame(egui::Frame::new().fill(theme::pal().paper).inner_margin(Margin::symmetric(12, 8)))
         .show(ui, |ui| {
             ui.add_enabled_ui(!busy, |ui| tabs_row(app, ui));
         });
     egui::Panel::bottom("status")
-        .frame(egui::Frame::new().fill(theme::CARD).inner_margin(Margin::symmetric(12, 4)))
+        .frame(egui::Frame::new().fill(theme::pal().card).inner_margin(Margin::symmetric(12, 4)))
         .show(ui, |ui| status_bar(app, ui));
     egui::Panel::left("people")
         .resizable(true)
         .default_size(270.0)
         .size_range(200.0..=460.0)
-        .frame(egui::Frame::new().fill(theme::CARD).inner_margin(Margin::same(10)))
+        .frame(egui::Frame::new().fill(theme::pal().card).inner_margin(Margin::same(10)))
         .show(ui, |ui| {
             ui.add_enabled_ui(!busy, |ui| people_list(app, ui));
         });
     egui::CentralPanel::default()
-        .frame(egui::Frame::new().fill(theme::PAPER).inner_margin(Margin::same(14)))
+        .frame(egui::Frame::new().fill(theme::pal().paper).inner_margin(Margin::same(14)))
         .show(ui, |ui| {
             ui.add_enabled_ui(!busy, |ui| {
                 if app.is_sample {
@@ -119,13 +119,28 @@ fn menu_bar(app: &mut FamilyApp, ui: &mut egui::Ui) {
                 }
             }
             ui.separator();
-            ui.label(RichText::new("Text size").color(theme::MUTED));
+            ui.label(RichText::new("Text size").color(theme::pal().muted));
             for (zoom, label) in [(1.0, "Normal"), (1.25, "Large"), (1.5, "Extra large")] {
                 if ui.selectable_label(app.zoom == zoom, label).clicked() {
                     app.set_zoom(&ctx, zoom);
                     ui.close();
                 }
             }
+            ui.separator();
+            ui.menu_button("Colors", |ui| {
+                for (i, (name, group, _)) in theme::SCHEMES.iter().enumerate() {
+                    if i == 0 || theme::SCHEMES[i - 1].1 != *group {
+                        if i > 0 {
+                            ui.separator();
+                        }
+                        ui.label(RichText::new(*group).color(theme::pal().muted));
+                    }
+                    if ui.selectable_label(theme::current() == i, *name).clicked() {
+                        theme::choose(&ctx, i);
+                        ui.close();
+                    }
+                }
+            });
         });
         ui.menu_button("Help", |ui| {
             if ui.button("About Family Keeper").clicked() {
@@ -161,11 +176,11 @@ fn tabs_row(app: &mut FamilyApp, ui: &mut egui::Ui) {
 
 fn status_bar(app: &FamilyApp, ui: &mut egui::Ui) {
     ui.horizontal(|ui| {
-        ui.label(RichText::new(&app.status).color(theme::MUTED));
+        ui.label(RichText::new(&app.status).color(theme::pal().muted));
         ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
             let saved = if app.dirty { "Unsaved changes" } else { "All changes saved" };
             let saved = if app.is_sample && !app.dirty { "Sample, not saved" } else { saved };
-            ui.label(RichText::new(saved).color(if app.dirty { theme::GOLD } else { theme::MUTED }));
+            ui.label(RichText::new(saved).color(if app.dirty { theme::pal().gold } else { theme::pal().muted }));
             ui.label(
                 RichText::new(format!(
                     "{}  ·  {}  ·  {}  ·",
@@ -173,7 +188,7 @@ fn status_bar(app: &FamilyApp, ui: &mut egui::Ui) {
                     count(app.db.families.len(), "marriage", "marriages"),
                     count(app.db.sources.len(), "source", "sources"),
                 ))
-                .color(theme::MUTED),
+                .color(theme::pal().muted),
             );
         });
     });
@@ -185,8 +200,8 @@ fn count(n: usize, one: &str, many: &str) -> String {
 
 fn sample_banner(app: &mut FamilyApp, ui: &mut egui::Ui) {
     egui::Frame::new()
-        .fill(theme::GOLD_SOFT)
-        .stroke(Stroke::new(1.0, theme::BORDER))
+        .fill(theme::pal().gold_soft)
+        .stroke(Stroke::new(1.0, theme::pal().border))
         .corner_radius(CornerRadius::same(6))
         .inner_margin(Margin::symmetric(12, 8))
         .show(ui, |ui| {
@@ -212,11 +227,11 @@ fn people_list(app: &mut FamilyApp, ui: &mut egui::Ui) {
     let shown = app.rows.len();
     let total = app.db.people.len();
     let label = if shown == total { count(total, "person", "people") } else { format!("{shown} of {}", count(total, "person", "people")) };
-    ui.label(RichText::new(label).small().color(theme::MUTED));
+    ui.label(RichText::new(label).small().color(theme::pal().muted));
     ui.separator();
     if app.rows.is_empty() {
         let text = if total == 0 { "Nobody here yet." } else { "No one matches that search." };
-        ui.label(RichText::new(text).color(theme::MUTED));
+        ui.label(RichText::new(text).color(theme::pal().muted));
         return;
     }
     let row_height = ui.text_style_height(&egui::TextStyle::Body) + ui.spacing().button_padding.y * 2.0;
@@ -240,13 +255,13 @@ fn people_list(app: &mut FamilyApp, ui: &mut egui::Ui) {
 // ---------- Family tab ----------
 
 fn section(ui: &mut egui::Ui, text: &str) {
-    ui.label(RichText::new(text).small().strong().color(theme::MUTED));
+    ui.label(RichText::new(text).small().strong().color(theme::pal().muted));
 }
 
 fn card_frame(highlight: bool) -> egui::Frame {
     egui::Frame::new()
-        .fill(if highlight { theme::GREEN_SOFT } else { theme::CARD })
-        .stroke(Stroke::new(if highlight { 1.5 } else { 1.0 }, if highlight { theme::GREEN } else { theme::BORDER }))
+        .fill(if highlight { theme::pal().accent_soft } else { theme::pal().card })
+        .stroke(Stroke::new(if highlight { 1.5 } else { 1.0 }, if highlight { theme::pal().accent } else { theme::pal().border }))
         .corner_radius(CornerRadius::same(8))
         .inner_margin(Margin::same(12))
 }
@@ -256,7 +271,7 @@ fn fact_line(ui: &mut egui::Ui, label: &str, event: Option<&Event>) {
     ui.horizontal_wrapped(|ui| {
         ui.spacing_mut().item_spacing.x = 4.0;
         ui.spacing_mut().interact_size.y = 16.0;
-        ui.label(RichText::new(label).color(theme::MUTED));
+        ui.label(RichText::new(label).color(theme::pal().muted));
         ui.label(e.summary());
     });
 }
@@ -287,13 +302,13 @@ fn relative_card(
         section(ui, label);
         match person.and_then(|id| db.person(id)) {
             Some(p) => {
-                if ui.link(RichText::new(p.name()).size(17.0).color(theme::GREEN)).clicked() {
+                if ui.link(RichText::new(p.name()).size(17.0).color(theme::pal().accent)).clicked() {
                     actions.push(Action::Select(p.id));
                 }
                 person_facts(ui, p);
             }
             None => {
-                ui.label(RichText::new("Not recorded").color(theme::MUTED));
+                ui.label(RichText::new("Not recorded").color(theme::pal().muted));
                 if let Some((anchor, relation)) = add {
                     ui.horizontal(|ui| {
                         if ui.button(format!("Add {}", relation.label())).clicked() {
@@ -331,7 +346,7 @@ fn family_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
         ui.add_space(60.0);
         ui.vertical_centered(|ui| {
             ui.heading("This family file is empty");
-            ui.label(RichText::new("Add the first person, or import a GEDCOM file.").color(theme::MUTED));
+            ui.label(RichText::new("Add the first person, or import a GEDCOM file.").color(theme::pal().muted));
             ui.add_space(8.0);
             if ui.button("Add the first person").clicked() {
                 app.actions.push(Action::NewPerson);
@@ -359,7 +374,7 @@ fn family_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
             ui.horizontal_wrapped(|ui| {
                 let names: Vec<String> = [f.husband, f.wife].into_iter().flatten().map(|p| db.name_of(p)).collect();
                 let names = if names.is_empty() { "Unknown".to_string() } else { names.join(" and ") };
-                ui.label(RichText::new(format!("Also has parents: {names}")).color(theme::MUTED));
+                ui.label(RichText::new(format!("Also has parents: {names}")).color(theme::pal().muted));
                 if ui.small_button("Show these first").clicked() {
                     actions.push(Action::PreferParents(id, f.id));
                 }
@@ -385,7 +400,7 @@ fn family_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
                     }
                     ui.vertical(|ui| {
                         ui.label(RichText::new(person.name()).size(21.0).strong());
-                        ui.label(RichText::new(format!("{}  ·  ID {}", person.sex.label(), person.id)).small().color(theme::MUTED));
+                        ui.label(RichText::new(format!("{}  ·  ID {}", person.sex.label(), person.id)).small().color(theme::pal().muted));
                         person_facts(ui, person);
                         ui.horizontal(|ui| {
                             if ui.button("Edit").clicked() {
@@ -400,7 +415,7 @@ fn family_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
                 if !person.notes.trim().is_empty() {
                     ui.add_space(4.0);
                     let first = person.notes.lines().find(|l| !l.trim().is_empty()).unwrap_or("");
-                    ui.label(RichText::new(format!("Note: {first}")).italics().color(theme::MUTED));
+                    ui.label(RichText::new(format!("Note: {first}")).italics().color(theme::pal().muted));
                 }
             });
             let spouse = family.and_then(|f| f.partner_of(id));
@@ -414,11 +429,11 @@ fn family_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
                 let text = f.event("MARR").map(Event::summary).filter(|s| !s.is_empty());
                 match text {
                     Some(t) => {
-                        ui.label(RichText::new("Married").color(theme::MUTED));
+                        ui.label(RichText::new("Married").color(theme::pal().muted));
                         ui.label(t);
                     }
                     None => {
-                        ui.label(RichText::new("No marriage details").color(theme::MUTED));
+                        ui.label(RichText::new("No marriage details").color(theme::pal().muted));
                     }
                 }
                 if ui.small_button("Edit marriage").clicked() {
@@ -476,16 +491,16 @@ fn kin_list(
         ui.set_min_height(120.0);
         section(ui, title);
         if ids.is_empty() {
-            ui.label(RichText::new("None recorded").color(theme::MUTED));
+            ui.label(RichText::new("None recorded").color(theme::pal().muted));
         }
         for (i, kid) in ids.iter().enumerate() {
             let Some(p) = db.person(*kid) else { continue };
             ui.horizontal(|ui| {
-                ui.label(RichText::new(format!("{}.", i + 1)).color(theme::MUTED));
-                if ui.link(RichText::new(p.name()).color(theme::GREEN)).clicked() {
+                ui.label(RichText::new(format!("{}.", i + 1)).color(theme::pal().muted));
+                if ui.link(RichText::new(p.name()).color(theme::pal().accent)).clicked() {
                     actions.push(Action::Select(p.id));
                 }
-                ui.label(RichText::new(p.lifespan()).color(theme::MUTED));
+                ui.label(RichText::new(p.lifespan()).color(theme::pal().muted));
                 if let Some(f) = family {
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                         if ui.small_button("Remove").on_hover_text("Takes them out of this family. Nobody gets deleted.").clicked() {
@@ -516,7 +531,7 @@ fn shorten(text: &str, max_chars: usize) -> String {
 
 fn pedigree_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
     let Some(root) = app.selected else {
-        ui.label(RichText::new("Choose a person to see their ancestors.").color(theme::MUTED));
+        ui.label(RichText::new("Choose a person to see their ancestors.").color(theme::pal().muted));
         return;
     };
     ui.horizontal(|ui| {
@@ -525,10 +540,10 @@ fn pedigree_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
             for g in [5, 4, 3] {
                 ui.selectable_value(&mut app.pedigree_generations, g, format!("{g}"));
             }
-            ui.label(RichText::new("Generations").color(theme::MUTED));
+            ui.label(RichText::new("Generations").color(theme::pal().muted));
         });
     });
-    ui.label(RichText::new("Click someone to move them to the front. Double-click to see their family.").small().color(theme::MUTED));
+    ui.label(RichText::new("Click someone to move them to the front. Double-click to see their family.").small().color(theme::pal().muted));
     ui.add_space(4.0);
 
     let gens = app.pedigree_generations;
@@ -560,7 +575,7 @@ fn pedigree_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
             let x = area.left() + g as f32 * (box_w + gap_x);
             egui::Rect::from_min_size(egui::pos2(x, y - box_h / 2.0), vec2(box_w, box_h))
         };
-        let line = Stroke::new(1.5, theme::BORDER);
+        let line = Stroke::new(1.5, theme::pal().border);
         for n in 2..(1usize << gens) {
             let (a, b) = (rect_of(n / 2), rect_of(n));
             let mid = a.right() + gap_x / 2.0;
@@ -572,20 +587,20 @@ fn pedigree_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
             let rect = rect_of(n);
             let chars = ((box_w - 20.0) / 7.2) as usize;
             let Some(p) = slots[n].and_then(|id| db.person(id)) else {
-                painter.rect(rect, 6.0, theme::PAPER, Stroke::new(1.0, theme::BORDER), StrokeKind::Inside);
-                painter.text(rect.center(), egui::Align2::CENTER_CENTER, "Not recorded", egui::FontId::proportional(13.0), theme::MUTED);
+                painter.rect(rect, 6.0, theme::pal().paper, Stroke::new(1.0, theme::pal().border), StrokeKind::Inside);
+                painter.text(rect.center(), egui::Align2::CENTER_CENTER, "Not recorded", egui::FontId::proportional(13.0), theme::pal().muted);
                 continue;
             };
             let response = ui.interact(rect, ui.scope_id().with(("pedigree", n)), Sense::click());
             let is_root = n == 1;
             let fill = if is_root {
-                theme::GREEN_SOFT
+                theme::pal().accent_soft
             } else if response.hovered() {
-                Color32::from_rgb(0xF4, 0xEF, 0xE2)
+                theme::pal().card_hover
             } else {
-                theme::CARD
+                theme::pal().card
             };
-            let edge = if is_root || response.hovered() { theme::GREEN } else { theme::BORDER };
+            let edge = if is_root || response.hovered() { theme::pal().accent } else { theme::pal().border };
             painter.rect(rect, 6.0, fill, Stroke::new(1.0, edge), StrokeKind::Inside);
             let left = rect.left() + 10.0;
             painter.text(
@@ -593,7 +608,7 @@ fn pedigree_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
                 egui::Align2::LEFT_CENTER,
                 shorten(&p.name(), chars),
                 egui::FontId::proportional(14.5),
-                theme::INK,
+                theme::pal().ink,
             );
             let birth_place = p.place_of("BIRT");
             let life = p.lifespan();
@@ -608,7 +623,7 @@ fn pedigree_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
                 egui::Align2::LEFT_CENTER,
                 shorten(&detail, chars + 4),
                 egui::FontId::proportional(12.5),
-                theme::MUTED,
+                theme::pal().muted,
             );
             if response.double_clicked() {
                 actions.push(Action::Open(p.id, Tab::Family));
@@ -629,7 +644,7 @@ fn table_heading(ui: &mut egui::Ui, text: &str) {
 fn people_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
     let (db, rows, actions, selected, sort) = (&app.db, &app.rows, &mut app.actions, app.selected, app.sort);
     if rows.is_empty() {
-        ui.label(RichText::new("Nobody to show.").color(theme::MUTED));
+        ui.label(RichText::new("Nobody to show.").color(theme::pal().muted));
         return;
     }
     ui.style_mut().interaction.selectable_labels = false;
@@ -706,7 +721,7 @@ fn people_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
 fn families_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
     let (db, actions) = (&app.db, &mut app.actions);
     if db.families.is_empty() {
-        ui.label(RichText::new("No marriages or families recorded yet.").color(theme::MUTED));
+        ui.label(RichText::new("No marriages or families recorded yet.").color(theme::pal().muted));
         return;
     }
     let families: Vec<&Family> = db.families.values().collect();
@@ -772,7 +787,7 @@ fn sources_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
     });
     ui.add_space(4.0);
     if db.sources.is_empty() {
-        ui.label(RichText::new("No sources yet. Sources record where your information came from.").color(theme::MUTED));
+        ui.label(RichText::new("No sources yet. Sources record where your information came from.").color(theme::pal().muted));
         return;
     }
     egui::ScrollArea::vertical().auto_shrink(false).show(ui, |ui| {
@@ -784,10 +799,10 @@ fn sources_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
                         let title = if s.title.trim().is_empty() { "(no title)" } else { s.title.as_str() };
                         ui.label(RichText::new(title).strong());
                         if !s.author.is_empty() {
-                            ui.label(RichText::new(&s.author).color(theme::MUTED));
+                            ui.label(RichText::new(&s.author).color(theme::pal().muted));
                         }
                         let n = uses.get(&s.id).copied().unwrap_or(0);
-                        ui.label(RichText::new(format!("Used {n} time{}", if n == 1 { "" } else { "s" })).small().color(theme::MUTED));
+                        ui.label(RichText::new(format!("Used {n} time{}", if n == 1 { "" } else { "s" })).small().color(theme::pal().muted));
                     });
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                         let used = uses.get(&s.id).copied().unwrap_or(0) > 0;
@@ -809,7 +824,7 @@ fn sources_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
 fn duplicates_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
     let (db, actions) = (&app.db, &mut app.actions);
     ui.label(RichText::new("Possible duplicates").size(18.0).strong());
-    ui.label(RichText::new("Finds people with the same name whose birth years don't rule out a match. You choose who to merge.").color(theme::MUTED));
+    ui.label(RichText::new("Finds people with the same name whose birth years don't rule out a match. You choose who to merge.").color(theme::pal().muted));
     ui.add_space(4.0);
     if ui.button("Check for duplicates").clicked() {
         actions.push(Action::FindDuplicates);
@@ -832,7 +847,7 @@ fn duplicates_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
                         for (col, p, other) in [(0, pa, pb), (1, pb, pa)] {
                             let ui = &mut c[col];
                             ui.label(RichText::new(p.name()).strong());
-                            ui.label(RichText::new(format!("ID {}", p.id)).small().color(theme::MUTED));
+                            ui.label(RichText::new(format!("ID {}", p.id)).small().color(theme::pal().muted));
                             person_facts(ui, p);
                             if ui.button("Keep this one and merge").clicked() {
                                 actions.push(Action::AskMerge { keep: p.id, drop: other.id });
@@ -872,12 +887,12 @@ fn reports_tab(app: &mut FamilyApp, ui: &mut egui::Ui) {
     ui.add_space(6.0);
     app.refresh_report();
     let Some(report) = &app.report.built else {
-        ui.label(RichText::new("Choose a person first.").color(theme::MUTED));
+        ui.label(RichText::new("Choose a person first.").color(theme::pal().muted));
         return;
     };
     egui::Frame::new()
-        .fill(Color32::WHITE)
-        .stroke(Stroke::new(1.0, theme::BORDER))
+        .fill(theme::pal().card)
+        .stroke(Stroke::new(1.0, theme::pal().border))
         .corner_radius(CornerRadius::same(6))
         .inner_margin(Margin::same(18))
         .show(ui, |ui| {

@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Family Keeper</title>
+<meta name="description" content="Family Keeper: a free, noncommercial genealogy program in the spirit of the classic family history programs, for Windows, Mac and Linux.">
+<link rel="icon" type="image/png" href="icon.png">
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --win: #ece9d8;
+    --frame1: #8fb36a;
+    --frame2: #5c8a37;
+    --frame3: #3e6b22;
+    --panel: #ffffff;
+    --edge: #a5b89a;
+    --link: #2c5d14;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    font: 14px/1.55 Tahoma, Verdana, "Segoe UI", sans-serif;
+    padding: 40px 16px 56px;
+    /* rolling-hills desktop */
+    background:
+      radial-gradient(140% 60% at 30% 100%, #4f9a2c 0 45%, transparent 46%),
+      radial-gradient(120% 55% at 85% 100%, #6db33f 0 42%, transparent 43%),
+      linear-gradient(#3a7fd5 0%, #7fb3ec 55%, #cfe4f7 75%, #8cc35a 76%, #4f9a2c 100%);
+    background-attachment: fixed;
+  }
+  .window {
+    max-width: 700px;
+    margin: 0 auto;
+    background: var(--win);
+    border: 3px solid var(--frame2);
+    border-top: 0;
+    border-radius: 9px 9px 4px 4px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    overflow: hidden;
+  }
+  .titlebar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 8px 6px 10px;
+    color: #fff; font: bold 14px Trebuchet MS, Tahoma, sans-serif;
+    text-shadow: 1px 1px 1px rgba(0,0,0,.45);
+    background: linear-gradient(#b3d38f 0%, var(--frame1) 12%, var(--frame2) 50%, var(--frame3) 92%, #2f5418 100%);
+    border-radius: 7px 7px 0 0;
+  }
+  .titlebar img { width: 18px; height: 18px; }
+  .titlebar span { flex: 1; }
+  .tb-btn {
+    width: 22px; height: 22px; border-radius: 4px;
+    border: 1px solid #fff;
+    background: linear-gradient(#a6cc7e, #5f8f38);
+    color: #fff; font: bold 12px/20px Tahoma, sans-serif; text-align: center;
+  }
+  .tb-btn.close { background: linear-gradient(#e9876b, #c1391a); }
+  .menubar {
+    display: flex; gap: 18px; padding: 4px 12px; font-size: 13px;
+    background: var(--win); border-bottom: 1px solid #fff; box-shadow: 0 1px 0 #c5c2b2;
+  }
+  .layout { display: flex; }
+  .tasks {
+    width: 190px; flex-shrink: 0; padding: 12px 10px;
+    background: linear-gradient(#a9c98a, #6f9c4c);
+  }
+  .task-box { background: #f3f8ee; border-radius: 5px 5px 0 0; margin-bottom: 12px; overflow: hidden; }
+  .task-box h4 {
+    margin: 0; padding: 5px 10px; font-size: 12px; color: #fff;
+    background: linear-gradient(90deg, #3e6b22, #7aa851);
+  }
+  .task-box a, .task-box p { display: block; margin: 0; padding: 4px 10px; font-size: 12px; color: var(--link); text-decoration: none; }
+  .task-box a:hover { text-decoration: underline; }
+  .task-box p { color: #333; }
+  .content { flex: 1; padding: 20px 22px 18px; background: var(--panel); }
+  .intro { display: flex; gap: 18px; align-items: center; }
+  .intro .appicon { width: 84px; height: 84px; flex-shrink: 0; filter: drop-shadow(1px 3px 3px rgba(0,0,0,.3)); }
+  h1 { font: bold 30px/1.1 "Trebuchet MS", Tahoma, sans-serif; margin: 0 0 6px; color: var(--frame3); }
+  .tag { margin: 0; color: #333; }
+  .btns { margin: 18px 0 4px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 8px 22px; border-radius: 16px;
+    font: bold 14px "Trebuchet MS", Tahoma, sans-serif; text-decoration: none; color: #fff;
+    text-shadow: 0 1px 1px rgba(0,0,0,.4);
+    background: linear-gradient(#9fd16a 0%, #5ea12b 50%, #4a8c1c 51%, #6fb23a 100%);
+    border: 1px solid #3a6d16;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 2px 4px rgba(0,0,0,.25);
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn.alt {
+    color: #1a1a1a; text-shadow: none;
+    background: linear-gradient(#ffffff 0%, #f1efe2 50%, #e3e0cf 51%, #f4f3ea 100%);
+    border-color: #8c8a7c;
+  }
+  h2 {
+    font: bold 15px "Trebuchet MS", Tahoma, sans-serif; color: var(--frame3);
+    margin: 24px 0 8px; padding-bottom: 4px;
+    border-bottom: 2px solid; border-image: linear-gradient(90deg, var(--frame2), transparent) 1;
+  }
+  ul { margin: 0; padding-left: 20px; }
+  li { margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; border: 1px solid var(--edge); }
+  th { text-align: left; font-size: 12px; padding: 4px 8px; background: linear-gradient(#ffffff, #e6e3d3); border-bottom: 1px solid #c5c2b2; }
+  td { padding: 5px 8px; border-bottom: 1px solid #eef0ea; }
+  tr:nth-child(odd) td { background: #f6faf2; }
+  code { font: 13px "Lucida Console", "Courier New", monospace; }
+  a { color: var(--link); }
+  .small { font-size: 12px; color: #555; margin: 8px 0 0; }
+  .status {
+    display: flex; font-size: 12px; background: var(--win); border-top: 1px solid #c5c2b2;
+  }
+  .status div { padding: 3px 10px; border-right: 1px solid #c5c2b2; }
+  .status div:first-child { flex: 1; }
+  @media (max-width: 600px) {
+    body { padding: 16px 8px 32px; }
+    .layout { flex-direction: column-reverse; }
+    .tasks { width: auto; }
+    .intro { flex-direction: column; text-align: center; }
+    .btns { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="window">
+  <div class="titlebar">
+    <img src="icon.png" width="18" height="18" alt="">
+    <span>Family Keeper</span>
+    <div class="tb-btn">_</div><div class="tb-btn">□</div><div class="tb-btn close">×</div>
+  </div>
+  <div class="menubar"><span>File</span><span>Edit</span><span>View</span><span>Favorites</span><span>Help</span></div>
+
+  <div class="layout">
+    <aside class="tasks">
+      <div class="task-box">
+        <h4>Get Started</h4>
+        <a href="https://github.com/dgmcint/Family-Keeper/releases/latest">» Download Family Keeper</a>
+        <a href="https://github.com/dgmcint/Family-Keeper">» View source on GitHub</a>
+      </div>
+      <div class="task-box">
+        <h4>Details</h4>
+        <p>Price: Free</p>
+        <p>Runs on: Windows, Mac, Linux</p>
+        <p>File type: .fkf</p>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="intro">
+        <img class="appicon" src="icon.png" width="84" height="84" alt="">
+        <div>
+          <h1>Family Keeper</h1>
+          <p class="tag">A simple, friendly place to record your family history, in the spirit of the classic genealogy programs. Free for Windows, Mac and Linux.</p>
+        </div>
+      </div>
+
+      <div class="btns">
+        <a class="btn" href="https://github.com/dgmcint/Family-Keeper/releases/latest">Download Now</a>
+        <a class="btn alt" href="https://github.com/dgmcint/Family-Keeper">GitHub</a>
+      </div>
+
+      <h2>Features</h2>
+      <ul>
+        <li>Record people, families, events and sources in one place</li>
+        <li>Clear family and pedigree screens, easy to learn</li>
+        <li>Saves your work as a <code>.fkf</code> family file</li>
+        <li>Your data stays on your computer, with no account and no ads</li>
+      </ul>
+
+      <h2>Which download?</h2>
+      <table>
+        <tr><th>Your computer</th><th>Choose</th></tr>
+        <tr><td>Windows</td><td>Windows build</td></tr>
+        <tr><td>Mac (Apple chip)</td><td>macOS Apple Silicon build</td></tr>
+        <tr><td>Mac (Intel chip)</td><td>macOS Intel build</td></tr>
+        <tr><td>Linux</td><td>Linux build</td></tr>
+      </table>
+      <p class="small">On the Releases page, look under <b>Assets</b>. Not sure which Mac? Apple menu → <b>About This Mac</b>.</p>
+
+      <h2>About</h2>
+      <p style="margin:0">Family Keeper is a free, independent project inspired by the straightforward genealogy programs many families relied on for years, rebuilt to run natively on modern computers.</p>
+      <p class="small">Licensed under the <a href="https://polyformproject.org/licenses/noncommercial/1.0.0/">PolyForm Noncommercial License 1.0.0</a>: free to use and share, not for sale.</p>
+    </main>
+  </div>
+
+  <div class="status"><div>Done</div><div>Free &amp; noncommercial</div></div>
+</div>
+
+</body>
+</html>

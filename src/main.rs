@@ -24,6 +24,11 @@ fn main() -> eframe::Result {
                 std::process::exit(2);
             };
             screenshot = Some(PathBuf::from(file));
+        } else if arg == "--colors" {
+            // Starts in a colour scheme by name, for pictures: Paper, Navy, Leather...
+            if let Some(name) = args.next() {
+                theme::set_name(&name.to_string_lossy());
+            }
         } else if arg == "--show" {
             // Starts on a given screen: pedigree, people, reports, edit-person...
             show = args.next().map(|s| s.to_string_lossy().into_owned());

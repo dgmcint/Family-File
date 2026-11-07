@@ -198,7 +198,7 @@ fn events_editor(
             }
             if *expanded == Some(i) {
                 egui::Frame::new()
-                    .fill(theme::PAPER)
+                    .fill(theme::pal().paper)
                     .corner_radius(6)
                     .inner_margin(10)
                     .show(ui, |ui| {
@@ -254,7 +254,7 @@ fn person_window(app: &mut FamilyApp, ctx: &egui::Context) {
         .max_height(size.y)
         .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
         .show(ctx, |ui| {
-            egui::Panel::bottom("person buttons").frame(egui::Frame::new().fill(theme::CARD)).show(ui, |ui| {
+            egui::Panel::bottom("person buttons").frame(egui::Frame::new().fill(theme::pal().card)).show(ui, |ui| {
                 ui.add_space(6.0);
                 ui.horizontal(|ui| {
                     if ui.button(RichText::new("Save").strong()).clicked() {
@@ -281,7 +281,7 @@ fn person_window(app: &mut FamilyApp, ctx: &egui::Context) {
                 });
                 ui.add_space(6.0);
                 ui.label(RichText::new("Events").strong());
-                ui.label(RichText::new("Dates can be written freely, such as 12 MAR 1850, ABT 1850 or BEF 1900.").small().color(theme::MUTED));
+                ui.label(RichText::new("Dates can be written freely, such as 12 MAR 1850, ABT 1850 or BEF 1900.").small().color(theme::pal().muted));
                 events_editor(ui, sources, &mut d.events, &mut editor.expanded, &CORE_EVENTS, PERSON_EVENTS, &mut editor.new_event, actions);
                 ui.add_space(8.0);
                 ui.label(RichText::new("Notes").strong());
@@ -376,7 +376,7 @@ fn family_window(app: &mut FamilyApp, ctx: &egui::Context) {
         .max_height(size.y)
         .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
         .show(ctx, |ui| {
-            egui::Panel::bottom("family buttons").frame(egui::Frame::new().fill(theme::CARD)).show(ui, |ui| {
+            egui::Panel::bottom("family buttons").frame(egui::Frame::new().fill(theme::pal().card)).show(ui, |ui| {
                 ui.add_space(6.0);
                 ui.horizontal(|ui| {
                     if ui.button(RichText::new("Save").strong()).clicked() {
@@ -396,7 +396,7 @@ fn family_window(app: &mut FamilyApp, ctx: &egui::Context) {
                 ui.add_space(8.0);
                 ui.label(RichText::new("Children, in order").strong());
                 if d.children.is_empty() {
-                    ui.label(RichText::new("None recorded").color(theme::MUTED));
+                    ui.label(RichText::new("None recorded").color(theme::pal().muted));
                 }
                 let mut swap = None;
                 let count = d.children.len();
@@ -494,7 +494,7 @@ fn picker_window(app: &mut FamilyApp, ctx: &egui::Context) {
                         }
                     }
                     if picker.results.is_empty() {
-                        ui.label(RichText::new("No one matches.").color(theme::MUTED));
+                        ui.label(RichText::new("No one matches.").color(theme::pal().muted));
                     }
                 });
             });

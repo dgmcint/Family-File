@@ -66,6 +66,10 @@ GitHub builds all three systems and attaches the downloads to a new release.
 - `--show <screen>` starts on one screen: family, pedigree, people, marriages, sources, duplicates,
   reports, edit-person, edit-marriage, add-relative, edit-source, delete or empty.
 
+## Planned
+
+- Automatic updates: when a new version is released, ask whether to update, then download it, verify it and restart
+
 ## License
 
 Family Keeper is free for any **noncommercial** use under the
